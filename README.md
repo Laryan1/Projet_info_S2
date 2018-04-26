@@ -6,18 +6,26 @@ Les types de données utiles ressembleront à :
 Les sommets : T_SOMMET est une structure
 
 typedef struct {              // Définition de la structure qui va contenir nos variables.
+
 char* nom;                    // Nom de la ville en question.
+
 double x,y ;                  // Coordonnées (lattitude, longitude) de la ville en question
+
 ARC voisins;                  // Pointeur vers : - l'indice de la ville d'arrivée,
-                                                 - le coût pour y aller depuis la ville en question,
-                                                 - l'adresse du voisin suivant
+
+- le coût pour y aller depuis la ville en question,
+
+- l'adresse du voisin suivant
+
 double pcc;                   // Coût total pour aller à la ville en question depuis la ville de départ.
+
 long pere;                    // Indice de la ville menant à la ville en question par le chemin le plus court.
+
 } T_SOMMET ;                  // 
 
 
-Les listes de successeurs : une liste classique avec un
-suivant, les valeurs sont l'indice de la ville d'arrivée  et le coût pour y aller.
+Les listes de successeurs : une liste classique avec un suivant; 
+les valeurs sont l'indice de la ville d'arrivée  et le coût pour y aller.
 
 typedef struct lsucc {        // Définition de la structure qui contient l'indice, le coût et le voisin suivant.
 long arrivee;                 // Indice de la ville voisine.
