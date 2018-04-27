@@ -1,0 +1,6 @@
+SOMMET* l_sommet_nv
+    //TABLEAU des sommets non visités (nomée X dans le sujet) 
+
+int* liste_pcc_connu
+    // /!\ Cette liste ne contient pas les VALEURS de pcc MAIS LES INDICES des sommets non visités dans le tableau l_sommet_nv
+    // Cette liste est triée en fonctions des valeurs de pcc et actualisée a chaque tour de boucle pour pouvoir accéder rapidement a la plus petite valeure de pcc
