@@ -7,9 +7,8 @@ typedef struct sommet{ 			// Définition de la structure qui va contenir nos var
 						//		   - l'adresse du voisin suivant
 	double pcc; 				// Coût total pour aller à la ville en question depuis la ville de départ.
 	long pere; 				// Indice de la ville menant à la ville en question par le chemin le plus court.
-	struct sommet * suiv;    		//Sommet suivant 
 
-}* T_SOMMET ;
+} T_SOMMET ;
 
 
 
