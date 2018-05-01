@@ -9,12 +9,14 @@ int liste_vide(Liste L){
 	return(!L);
 }
 
+/*
 void visualiser(Liste L){
 	while(L!=NULL){
 		affiche(&(L->val));
 		L = L->suiv;
 	}
 }
+*/
 
 Liste ajout_tete(ELEMENT e, Liste L){
 	Liste p = calloc(1, sizeof(Liste));
