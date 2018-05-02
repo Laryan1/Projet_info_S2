@@ -25,7 +25,7 @@ void ajouter_arc(ARC arc_init, ARC arc_a_ajouter){
 	arc_init->suiv = arc_a_ajouter;
 }
 
-SOMMET creer_sommet(char* nom, double x, double y ,ARC voisins, double pcc,	long pere){
+SOMMET creer_sommet(char* nom, double x, double y ,ARC voisins){
 	//Permet de créer un sommet
 	SOMMET a;
 	a.nom = nom;
