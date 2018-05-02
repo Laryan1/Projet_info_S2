@@ -64,3 +64,11 @@ Liste ajout_pcc_triee(long i, Liste pcc_triee, SOMMET * l_sommet){
 
 	return pcc_init;
 }
+
+int appartient(Liste sommet_visites, long arrivee){
+	//sommet_visites contient les indices des sommets visités 
+	while (sommet_visites->suiv != NULL){
+		if (arrivee == points_visites->val) return 1;
+	}
+	return 0;
+}
