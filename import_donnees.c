@@ -1,40 +1,71 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <float.h>
 #include "import_donnees.h"
 
-void lecture_fichier(FILE* graphe,T_SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs){
-	char route[512], nom_sommet[512];
+ARC creer_arc(long arrivee,	double cout){
+	//Permet de cr?r un arc. De base il ne contient pas d'arc suivant
+	// On peut ajouter des arcs avec la fonction "ajouter_arc"
+	ARC a = calloc(1, sizeof(*a));
+
+	a->cout = cout;
+	a->arrivee = arrivee;
+	a->suiv = NULL;
+
+	return(a);
+}
+
+SOMMET creer_sommet(char* nom_sommet, double lattitude, double longitude, long cpmt){
+    SOMMET sommet;
+    ARC nouvel_arc=NULL;
+	sommet.nom=strdup(nom_sommet);
+    sommet.x=lattitude;
+    sommet.y=longitude;
+    sommet.voisins=nouvel_arc;
+    sommet.pcc=DBL_MAX;
+    sommet.pere=-1;
+    return sommet;
+}
+
+void lecture_fichier(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs){
+	char route[512], nom_sommet[511];
 	char str[512];
 	long indice_sommet, indice_depart, indice_arrivee;
 	double lattitude, longitude, cout;
-	int cmpt=0;
+	long cmpt=0;
+	ARC temp_arc;
+
 	fgets(str,511,graphe);
 	fgets(str,511,graphe);
-	printf("%s", str);
+
     for (cmpt; cmpt<(*nb_sommets);cmpt++){
         fscanf(graphe,"%ld %lf %lf %s %s",&indice_sommet, &lattitude, &longitude,route ,nom_sommet);
-        printf("%ld %lf %lf %s %s",indice_sommet, lattitude, longitude,route ,nom_sommet);
-        puts("");
+        liste_sommets[cmpt]=creer_sommet(nom_sommet,lattitude,longitude,cmpt);
+        printf("SOMMET N%d, indice %d: %s\n",cmpt+1, cmpt, liste_sommets[0].nom);
+
     }
 
 	fgets(str,511,graphe);
 	fgets(str,511,graphe);
-	printf("%s", str);
 
     for (cmpt=0; cmpt<*nb_arcs;cmpt++){
     	fscanf(graphe, "%ld %ld %lf ",&indice_depart, &indice_arrivee, &cout);
-        printf("%ld %ld %lf ",indice_depart, indice_arrivee, cout);
-        puts("");
+
+    	if (liste_sommets[indice_depart].voisins==NULL) liste_sommets[indice_depart].voisins=creer_arc(indice_arrivee, cout);
+
+    	else {
+            temp_arc=liste_sommets[indice_depart].voisins; //On prend le premier voisin qui est celui dans le sommet
+            while(temp_arc->suiv != NULL) temp_arc=temp_arc->suiv; // On parcours tous les arcs jusqu'a ce que le suivant soit nul, on peut alors ajouter notre nouvel arc
+            temp_arc->suiv = creer_arc(indice_arrivee,cout); // On ajoute notre arc nouvellement cr?r a la fin de la liste des voisins
+    	}
 
     }
-    printf("END");
 }
 
 void main(){
-
     FILE* graphe;
-    char* nom_fichier="graphe2.txt";
+    char* nom_fichier="graphe1.txt";
     char ligne[400];
     long nb_sommets, nb_arcs;
 
@@ -42,9 +73,8 @@ void main(){
 
     fscanf(graphe,"%ld %ld", &(nb_sommets), &(nb_arcs));
     printf("%ld %ld\n", nb_sommets, nb_arcs);
-    T_SOMMET liste_sommets[nb_sommets];
+    SOMMET liste_sommets[nb_sommets];
 
 	lecture_fichier(graphe, liste_sommets, &nb_sommets, &nb_arcs);
-
     fclose(graphe);
 }

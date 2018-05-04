@@ -1,0 +1,46 @@
+14	29
+Sommets du graphe	
+0	0.05	0.7	M1	Sommet1
+1	0.05	0.3	M1	Sommet2
+2	0.2	0.9	M1	Sommet3
+3	0.2	0.5	M1	Sommet4
+4	0.2	0.1	M1	Sommet5
+5	0.4	0.7	M1	Sommet6
+6	0.4	0.5	M1	Sommet7
+7	0.4	0.3	M1	Sommet8
+8	0.6	0.9	M1	Sommet9
+9	0.6	0.5	M1	Sommet10
+10	0.6	0.1	M1	Sommet11
+11	0.8	0.7	M1	Sommet12
+12	0.8	0.3	M1	Sommet13
+13	0.95	0.5	M1	Sommet14
+Arcs du graphe : depart arrivee valeur		
+0	1	2
+0	3	4
+1	4	2
+2	0	3
+3	1	1
+3	2	2
+3	5	2
+4	3	3
+4	7	4
+5	2	1
+5	8	1
+5	3	4
+6	4	2
+6	5	3
+6	9	8
+7	6	1
+7	10	4
+8	2	5
+9	10	1
+9	11	1
+9	5	2
+9	8	3
+10	6	2
+10	12	2
+11	8	5
+12	9	3
+12	13	4
+12	11	6
+13	11	2
