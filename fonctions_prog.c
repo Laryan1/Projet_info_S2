@@ -145,8 +145,8 @@ int appartient(Liste l, long indice){
 	return 0;
 }
 
-void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arrivee ){
-	Liste sommet_visites=NULL;
+void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arrivee,long nb_sommets ){
+	Arbre sommet_visites=creer_chene(nb_sommets);
 	pcc_connus = ajout_tete(i_depart, pcc_connus);
 	long compteur = 0;
 	int tmps = time(NULL);
@@ -155,7 +155,7 @@ void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arri
 	do{
 		long i_pt_courant = min_pcc(pcc_connus, liste_sommets);				
 		//Le point courant est celui de plus petit pcc (Le premier de la liste pcc_connus)
-		sommet_visites = ajout_tete(i_pt_courant, sommet_visites);
+		ajouter_arbre(i_pt_courant, nb_sommets, sommet_visites);
 		//On ajoute ce point a la liste des points visites, c'est a dire dont on a trouve la plus petit pcc
 		pcc_connus = supprimer(pcc_connus, i_pt_courant);
 		//On supprime donc le point courant de la liste des pcc connus
@@ -171,7 +171,7 @@ void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arri
 				liste_sommets[i_voisin].pere = i_pt_courant;
 			}
 			
-			if (appartient(pcc_connus, i_voisin)==0 && appartient(sommet_visites, i_voisin)==0){
+			if (appartient(pcc_connus, i_voisin)==0 && est_present(i_voisin,nb_sommets,sommet_visites)==0){
 				//Si le pont n'appartient pas deja a la liste de pcc_connus et si'il n'a pas deja ete visite
 				//on l'ajoute a cette derniere
 				pcc_connus = ajout_tete(i_voisin, pcc_connus); 
@@ -188,8 +188,8 @@ void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arri
 			tmps = time(NULL);
 		}
 
-	} while(appartient(sommet_visites, i_arrivee) == 0 && pcc_connus != NULL);
-
+	} while(est_present(i_arrivee,nb_sommets,sommet_visites)==0 && pcc_connus != NULL);
+	free_arbre(sommet_visites);
 }
 
 

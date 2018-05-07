@@ -10,7 +10,7 @@ main(){
 	Liste pcc_connus, points_visites, chemin_a_prendre; pcc_connus = NULL; points_visites = NULL; chemin_a_prendre = NULL;
 	FILE* graphe;
     
-    char dir[100]; strcpy(dir,"/home/phelma/tdinfo/projetS22018/");
+    char dir[100]; strcpy(dir,"/home/phelma/Documents/Projet_info_S2-master/graphes/");
     char ligne[400];
     long nb_sommets, nb_arcs, i_depart, i_arrivee;
     int enable_timer = 1,temps_debut_import, temps_fin_import, temps_debut_dijkstra, temps_fin_dijkstra;
@@ -41,7 +41,7 @@ main(){
 	/*dijkstra*/
 	if (enable_timer){temps_debut_dijkstra = time(NULL);}
 
-	dijkstra(liste_sommets, pcc_connus, i_depart, i_arrivee);
+	dijkstra(liste_sommets, pcc_connus, i_depart, i_arrivee, nb_sommets);
 	
 	//On a trouve le chemin le plus court, il faut maintenant "remonter" le chemin entre l'arrivee et le depart
 	//Pour cela on utilise  une liste que l'on ou l'on va ajouter en tete les peres jusqu'a arrivee au point de depart

@@ -4,17 +4,14 @@ DIRSDL=
 CFLAGS=
 LDFLAGS=
 
-dijkstra : liste.o fonctions_prog.o dijkstra.o 
-	gcc -o $@ $^ $(LDFLAGS)
-
-test_ajout_pcc_triee : liste.o fonctions_prog.o test_ajout_pcc_triee.o 
-	gcc -o $@ $^ $(LDFLAGS)
+dijkstra : liste.o fonctions_prog.o dijkstra.o arbres.o
+	gcc -lm -o $@ $^ $(LDFLAGS)
 
 fonctions : fonctions_prog.o
-	gcc -o $@ $^ $(LDFLAGS)
+	gcc -lm -o $@ $^ $(LDFLAGS)
 	
 %.o:%.c 
-	gcc -g -c $(CFLAGS)  $^
+	gcc -lm -g -c $(CFLAGS)  $^
 
 clean :
 	rm *.o dijkstra
