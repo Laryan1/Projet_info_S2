@@ -6,8 +6,9 @@
 #include <time.h>
 
 main(){
-
-	Liste pcc_connus, points_visites, chemin_a_prendre; pcc_connus = NULL; points_visites = NULL; chemin_a_prendre = NULL;
+	Liste pcc_connus, chemin_a_prendre; 
+	pcc_connus = NULL; 
+	chemin_a_prendre = NULL;
 	FILE* graphe;
     
     char dir[100]; strcpy(dir,"/home/phelma/Documents/Projet_info_S2-master/graphes/");
@@ -33,16 +34,16 @@ main(){
 	/*Selections du depart depart + arrivee */
 	sel_depart_arrivee(&i_depart, &i_arrivee, nb_sommets, liste_sommets);
 	/*EN DUR*//*
-	i_depart = 0;
+	i_depart = 1;
 	liste_sommets[i_depart].pcc = 0;
-	i_arrivee = 6;
+	i_arrivee = 10;
 	*/
 
 	/*dijkstra*/
 	if (enable_timer){temps_debut_dijkstra = time(NULL);}
 
 	dijkstra(liste_sommets, pcc_connus, i_depart, i_arrivee, nb_sommets);
-	
+
 	//On a trouve le chemin le plus court, il faut maintenant "remonter" le chemin entre l'arrivee et le depart
 	//Pour cela on utilise  une liste que l'on ou l'on va ajouter en tete les peres jusqu'a arrivee au point de depart
 	//En parcourant cette liste dans le sens "normal" on aura ainsi acces au trajet a suivre

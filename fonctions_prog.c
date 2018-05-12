@@ -27,6 +27,7 @@ SOMMET creer_sommet(char* nom_sommet, double lattitude, double longitude, long c
     sommet.pere=-1;
     return sommet;
 }
+
 char* sel_graphe(char* dir){
 	/*
 Liste des graphes disponibles : 
@@ -65,16 +66,16 @@ Liste des graphes disponibles :
 
 void sel_depart_arrivee(long* p_i_depart, long* p_i_arrivee, long nb_sommets, SOMMET* liste_sommets){
 	nb_sommets -=1; // l'indice max est le nb de sommet -1
-	printf("\nQuel est l'indice du point de départ : ");
+	printf("\nQuel est l'indice du point de depart : ");
 	do{
 		scanf("%ld",p_i_depart);
-		if(*p_i_depart > nb_sommets)printf("\n/!\\ Ce sommet n'existe pas : l'indice du dernier sommet est %ld /!\\\nVeuillez en rentrer un nouveau départ : ", nb_sommets);
+		if(*p_i_depart > nb_sommets)printf("\n/!\\ Ce sommet n'existe pas : l'indice du dernier sommet est %ld /!\\\nVeuillez en rentrer un nouveau depart : ", nb_sommets);
 	}while(*p_i_depart > nb_sommets);
-	printf("\nQuel est l'indice du point d'arrivée : ");
+	printf("\nQuel est l'indice du point d'arrivee : ");
 	
 	do{
 		scanf("%ld",p_i_arrivee);
-		if(*p_i_arrivee > nb_sommets)printf("\n/!\\ Ce sommet n'existe pas : l'indice du dernier sommet est %ld /!\\\nVeuillez en rentrer une nouvelle arrivée : ", nb_sommets);
+		if(*p_i_arrivee > nb_sommets)printf("\n/!\\ Ce sommet n'existe pas : l'indice du dernier sommet est %ld /!\\\nVeuillez en rentrer une nouvelle arrivee : ", nb_sommets);
 	}while(*p_i_arrivee > nb_sommets);
 	printf("\n");
 
@@ -120,75 +121,102 @@ void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* 
     }
 }
 
-
-long min_pcc(Liste pcc_connus, SOMMET* liste_sommets){
-	long i_min = pcc_connus->val; //On initialise avec le premier indice de pcc
-	while(pcc_connus!=NULL){
-		if (liste_sommets[pcc_connus->val].pcc < liste_sommets[i_min].pcc){
-			i_min = pcc_connus->val;
-		}
-		pcc_connus = pcc_connus->suiv;
+Liste ajout_trie(ELEMENT e, Liste L,SOMMET* liste_sommets){
+	Liste p = calloc(1, sizeof(Liste));											//On alloue l'espace memoire pour le nouvel element "p" de la liste "L". 
+	if (p == NULL) return NULL;													//On verifie la bonne allocation de l'espace memoire.
+	p->val = e;		
+															//On attribue a la valeur de "p", l'element e, correspondant a l'indice du sommet.
+	p->suiv=NULL;
+	if(!L) return (p);
+	if (liste_sommets[p->val].pcc<=liste_sommets[L->val].pcc){				
+	//On teste si la valeur "e" donne deja acces au sommet de plus petit pcc.
+		p->suiv=L;
+		return (p);															
+	//Si c'est le cas, on renvoie directement la liste "p" ayant pour suite la liste "L".
 	}
 
-	return(i_min);
+	Liste temp=L;								
+								//On cree un tampon nous permettant de nous deplacer le long de "L".
+	while(temp->suiv!=NULL){
+		if (liste_sommets[p->val].pcc<=liste_sommets[(temp->suiv)->val].pcc){	//Si le sommet d'indice "e" a un pcc plus grand que le sommet de l'indice indique par le suivant du tampon.
+			p->suiv=temp->suiv;					
+								//On place a la suite du tampon, la liste "p", on l'insere a l'interieur de la liste "L".
+			temp->suiv=p;
+			return(L);															//Et on retourne la liste "L".
+		}
+		temp=temp->suiv;														//On passe a l'element suivant.
+	}
+	temp->suiv=p;	
+															//Si on traite le sommet au plus grand pcc, on l'ajoute donc a la fin de la liste.
+	return (L);
 }
 
-int appartient(Liste l, long indice){
-	//l contient les indices des sommets visites 
-	//Retourne 1 si le sommet "indice" est dans la liste, 0 s'il n'y est pas
-	if (l == NULL) return 0;
+Liste supprimer_trie(Liste L){	//Dans cette fonction on supprimer le premier element de la liste L, donc on libere l'espace memoire alloue et on retourne l'element suivant.
+	Liste temp=L->suiv;							
+	free(L);
+	return (temp);
+}
 
-	while (l != NULL){
-		if (indice == l->val) return 1;
-		l = l->suiv;
-	}
-	return 0;
+Liste ajout_tete(ELEMENT e, Liste L){
+	Liste p = calloc(1, sizeof(Liste));
+	
+	if (p == NULL) return NULL;
+	
+	p->val = e;
+	p->suiv = L;
+	
+	return(p);
 }
 
 void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arrivee,long nb_sommets ){
 	Arbre sommet_visites=creer_chene(nb_sommets);
-	pcc_connus = ajout_tete(i_depart, pcc_connus);
+//#################################################################################
+	pcc_connus = ajout_trie(i_depart, pcc_connus,liste_sommets);
+//#################################################################################
 	long compteur = 0;
 	int tmps = time(NULL);
 	printf("Nombre de points parcourus : 0");
 
 	do{
-		long i_pt_courant = min_pcc(pcc_connus, liste_sommets);				
+		long i_pt_courant = pcc_connus->val;
 		//Le point courant est celui de plus petit pcc (Le premier de la liste pcc_connus)
-		ajouter_arbre(i_pt_courant, nb_sommets, sommet_visites);
-		//On ajoute ce point a la liste des points visites, c'est a dire dont on a trouve la plus petit pcc
-		pcc_connus = supprimer(pcc_connus, i_pt_courant);
+		pcc_connus = supprimer_trie(pcc_connus);
 		//On supprime donc le point courant de la liste des pcc connus
-		ARC arc_voisin = liste_sommets[i_pt_courant].voisins;
-		//C'est le premier voisin a considerer
-		while(arc_voisin!=NULL){
-			//Grace a ce while, on parcous toute la liste des voisin. A chaque tour de boucle, on remplace arc_voisin par l'arc suivant	
-			long i_voisin = arc_voisin->arrivee;
+		if (est_present(i_pt_courant,nb_sommets,sommet_visites)==0){
 
-			if(liste_sommets[i_voisin].pcc > liste_sommets[i_pt_courant].pcc + arc_voisin->cout){
-				//Si le pcc actuel du voisin est plus grand que la somme du pcc du pt courant et du cout entre les 2 point, on remplace le pcc et le pere
-				liste_sommets[i_voisin].pcc = liste_sommets[i_pt_courant].pcc + arc_voisin->cout;
-				liste_sommets[i_voisin].pere = i_pt_courant;
+			ajouter_arbre(i_pt_courant, nb_sommets, sommet_visites);
+			//On ajoute ce point a la liste des points visites, c'est a dire dont on a trouve la plus petit pcc
+			ARC arc_voisin = liste_sommets[i_pt_courant].voisins;
+			//C'est le premier voisin a considerer
+			while(arc_voisin!=NULL){
+				//Grace a ce while, on parcous toute la liste des voisin. A chaque tour de boucle, on remplace arc_voisin par l'arc suivant	
+				long i_voisin = arc_voisin->arrivee;
+
+				if(liste_sommets[i_voisin].pcc > liste_sommets[i_pt_courant].pcc + arc_voisin->cout){
+					//Si le pcc actuel du voisin est plus grand que la somme du pcc du pt courant et du cout entre les 2 point, on remplace le pcc et le pere
+					liste_sommets[i_voisin].pcc = liste_sommets[i_pt_courant].pcc + arc_voisin->cout;
+					liste_sommets[i_voisin].pere = i_pt_courant;
+				}
+				
+		//#################################################################################
+				if (est_present(i_voisin,nb_sommets,sommet_visites)==0){
+					//Si le point n'a pas deja ete visite, on l'ajoute a la liste des pcc.
+					pcc_connus = ajout_trie(i_voisin, pcc_connus,liste_sommets); 
+				}
+		//#################################################################################
+				arc_voisin = arc_voisin->suiv;
 			}
-			
-			if (appartient(pcc_connus, i_voisin)==0 && est_present(i_voisin,nb_sommets,sommet_visites)==0){
-				//Si le pont n'appartient pas deja a la liste de pcc_connus et si'il n'a pas deja ete visite
-				//on l'ajoute a cette derniere
-				pcc_connus = ajout_tete(i_voisin, pcc_connus); 
+
+			/*Affichage du nombre de points parcourus toutes les secondes : */
+			compteur ++;
+			if (tmps+1>= time(NULL)){
+				printf("\rNombre de points parcourus : %ld", compteur);
+				tmps = time(NULL);
 			}
-
-			arc_voisin = arc_voisin->suiv;
 		}
-		
-
-		/*Affichage du nombre de points parcourus toutes les secondes : */
-		compteur ++;
-		if (tmps+1>= time(NULL)){
-			printf("\rNombre de points parcourus : %ld", compteur);
-			tmps = time(NULL);
-		}
-
 	} while(est_present(i_arrivee,nb_sommets,sommet_visites)==0 && pcc_connus != NULL);
+
+	while(pcc_connus) pcc_connus=supprimer_trie(pcc_connus);
 	free_arbre(sommet_visites);
 }
 
@@ -199,7 +227,7 @@ Liste remonter_chemin(Liste chemin_a_prendre, long i_arrivee, long i_depart, SOM
 	chemin_a_prendre = ajout_tete(i_arrivee, chemin_a_prendre);
 
 	while(chemin_a_prendre->val != i_depart){ // tant que le premier sommet de la liste n'est pas le point de depart
-		chemin_a_prendre = ajout_tete(liste_sommets[chemin_a_prendre->val].pere, chemin_a_prendre); //On prend le sommet que l'on considère et l'on ajoute en tete son pere
+		chemin_a_prendre = ajout_tete(liste_sommets[chemin_a_prendre->val].pere, chemin_a_prendre); //On prend le sommet que l'on considere et l'on ajoute en tete son pere
 	}
 	return(chemin_a_prendre);
 }
@@ -208,13 +236,13 @@ void afficher_chemin(Liste chemin_a_prendre, SOMMET* liste_sommets, long i_depar
 	if (chemin_a_prendre->val == -1){
 		printf("\n##########################\n######### DESOLE #########\n##########################\n\n");
 		printf("\nImpossible de relier les points :\n");
-		printf("Point de départ :\n\t"); afficher_sommet(liste_sommets[i_depart]);printf("\n");
-		printf("Point d'arrivée :\n\t"); afficher_sommet(liste_sommets[i_arrivee]);printf("\n");
+		printf("Point de depart :\n\t"); afficher_sommet(liste_sommets[i_depart]);printf("\n");
+		printf("Point d'arrivee :\n\t"); afficher_sommet(liste_sommets[i_arrivee]);printf("\n");
 	}
 	else{
 		printf("\n##########################\n##### CHEMIN TROUVE! #####\n##########################\n\n");
-		printf("Point de départ : "); afficher_sommet(liste_sommets[i_depart]);printf("\n");
-		printf("Point d'arrivée : "); afficher_sommet(liste_sommets[i_arrivee]);printf("\n");
+		printf("Point de depart : "); afficher_sommet(liste_sommets[i_depart]);printf("\n");
+		printf("Point d'arrivee : "); afficher_sommet(liste_sommets[i_arrivee]);printf("\n");
 
 		printf("\n##########################\n#### Route a prendre: ####\n##########################\n\n");
 
