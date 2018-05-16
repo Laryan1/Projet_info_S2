@@ -5,14 +5,13 @@
 #include <float.h>
 #include <time.h>
 
-main(){
+int main(){
 	Liste pcc_connus, chemin_a_prendre; 
 	pcc_connus = NULL; 
 	chemin_a_prendre = NULL;
 	FILE* graphe;
     
     char dir[100]; strcpy(dir,"/home/phelma/Documents/Projet_info_S2-master/graphes/");
-    char ligne[400];
     long nb_sommets, nb_arcs, i_depart, i_arrivee;
     int enable_timer = 1,temps_debut_import, temps_fin_import, temps_debut_dijkstra, temps_fin_dijkstra;
 	/*initialisation des sommets et des arcs*/
@@ -55,4 +54,5 @@ main(){
 	free(liste_sommets);
 
 	if (enable_timer){temps_fin_dijkstra = time(NULL);printf("\n\nTemps de recherche : ");afficher_secondes(temps_fin_dijkstra-temps_debut_dijkstra);printf("\n\n");}
+	return 1;
 }

@@ -9,6 +9,7 @@ typedef struct larc { 			// Definition de la structure qui contient l'indice, le
 typedef struct { 			// Definition de la structure qui va contenir nos variables.
 
 	char* nom; 					// Nom de la ville en question.
+	char* route;
 	double x,y ; 				// Coordonnees (lattitude, longitude) de la ville en question
 	ARC voisins; 				// Pointeur vers : - l'indice de la ville d'arrivee,
 								//				   - le coût pour y aller depuis la ville en question,

@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
+#include <time.h>
 
 typedef long ELEMENT;
 
@@ -12,7 +13,7 @@ typedef struct _Liste {
 	struct _Liste * suiv;} * Liste;
 
 ARC creer_arc(long arrivee,double cout);
-SOMMET creer_sommet(char* nom_sommet, double lattitude, double longitude, long cpmt);
+SOMMET creer_sommet(char* nom_sommet,char* route, double lattitude, double longitude);
 Liste ajout_trie(ELEMENT e, Liste L,SOMMET* liste_sommets);
 Liste supprimer_trie(Liste L);
 Liste ajout_tete(ELEMENT e, Liste L);

@@ -4,7 +4,7 @@
 /* ################ FONCTIONS ############# */
 /* ######################################## */
 
-ARC creer_arc(long arrivee,	double cout){
+ARC creer_arc(long arrivee, double cout){
 	//Permet de creer un arc. De base il ne contient pas d'arc suivant
 	// On peut ajouter des arcs avec la fonction "ajouter_arc"
 	ARC a = calloc(1, sizeof(*a));
@@ -16,10 +16,11 @@ ARC creer_arc(long arrivee,	double cout){
 	return(a);
 }
 
-SOMMET creer_sommet(char* nom_sommet, double lattitude, double longitude, long cpmt){
+SOMMET creer_sommet(char* nom_sommet, char* route, double lattitude, double longitude){
     SOMMET sommet;
     ARC nouvel_arc=NULL;
     sommet.nom = strdup(nom_sommet);
+    sommet.route = strdup(route);
     sommet.x=lattitude;
     sommet.y=longitude;
     sommet.voisins=nouvel_arc;
@@ -84,7 +85,7 @@ void sel_depart_arrivee(long* p_i_depart, long* p_i_arrivee, long nb_sommets, SO
 }
 
 void afficher_sommet(SOMMET s){
-	printf("nom : %s\tlattitude : %.2lf\tlongitute %.2lf", s.nom, s.x, s.y);
+	printf("nom : %s\tligne : %s\tlattitude : %.4lf\tlongitute : %.4lf", s.nom, s.route, s.x, s.y);
 }
 
 void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs){
@@ -98,24 +99,31 @@ void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* 
 	fgets(str,511,graphe);
 	fgets(str,511,graphe);
 
-    for (cmpt; cmpt<(*nb_sommets);cmpt++){
-        fscanf(graphe,"%ld %lf %lf %s %s",&indice_sommet, &lattitude, &longitude,route ,nom_sommet);
-        liste_sommets[cmpt]=creer_sommet(nom_sommet,lattitude,longitude,cmpt);
+    for (cmpt=0; cmpt<(*nb_sommets);cmpt++){
+        fscanf(graphe,"%ld %lf %lf %s",&indice_sommet, &lattitude, &longitude,route);
+	fgets(str,2,graphe);
+	fgets(nom_sommet,511,graphe);
+	strchr(nom_sommet,'\n')[0]='\0';
+        liste_sommets[cmpt]=creer_sommet(nom_sommet,route,lattitude,longitude);
 
     }
 
 	fgets(str,511,graphe);
-	fgets(str,511,graphe);
+	//fgets(str,511,graphe);
 
     for (cmpt=0; cmpt<*nb_arcs;cmpt++){
     	fscanf(graphe, "%ld %ld %lf ",&indice_depart, &indice_arrivee, &cout);
 
-    	if (liste_sommets[indice_depart].voisins==NULL) liste_sommets[indice_depart].voisins=creer_arc(indice_arrivee, cout);
-
+    	if (liste_sommets[indice_depart].voisins==NULL){
+	    //Selon si le nom du sommet de depart et d'arrivee est le meme, on donne un cout de 0, ou un cout normal a l'arc cree. Cela resoud le probleme des stations de metro / tram. 
+	    if (strcmp(liste_sommets[indice_depart].nom, liste_sommets[indice_arrivee].nom)==0) liste_sommets[indice_depart].voisins=creer_arc(indice_arrivee, 0);
+	    else (liste_sommets[indice_depart].voisins=creer_arc(indice_arrivee, cout));
+	    }
     	else {
             temp_arc=liste_sommets[indice_depart].voisins; //On prend le premier voisin qui est celui dans le sommet
             while(temp_arc->suiv != NULL) temp_arc=temp_arc->suiv; // On parcours tous les arcs jusqu'a ce que le suivant soit nul, on peut alors ajouter notre nouvel arc
-            temp_arc->suiv = creer_arc(indice_arrivee,cout); // On ajoute notre arc nouvellement cr?r a la fin de la liste des voisins
+	    if (strcmp(liste_sommets[indice_depart].nom, liste_sommets[indice_arrivee].nom)==0) temp_arc->suiv=creer_arc(indice_arrivee, 0);
+	    else (temp_arc->suiv=creer_arc(indice_arrivee, cout));				// On ajoute notre arc nouvellement cree a la fin de la liste des voisins
     	}
 
     }
@@ -250,7 +258,7 @@ void afficher_chemin(Liste chemin_a_prendre, SOMMET* liste_sommets, long i_depar
 
 		while(chemin_a_prendre!=NULL){
 			double cout_courant = liste_sommets[chemin_a_prendre->val].pcc;
-			afficher_sommet(liste_sommets[chemin_a_prendre->val]); printf("\tCout = %.2lf \tCout total = %.2lf\n", cout_courant - cout_precedent, cout_courant);
+			afficher_sommet(liste_sommets[chemin_a_prendre->val]); printf("\tCout = %12.2lf \tCout total = %12.2lf\n", cout_courant - cout_precedent, cout_courant);
 			cout_precedent = cout_courant;
 			chemin_a_prendre = chemin_a_prendre->suiv;
 		}

@@ -5,13 +5,10 @@ CFLAGS=
 LDFLAGS=
 
 dijkstra : fonctions_prog.o dijkstra.o arbres.o
-	gcc -lm -o $@ $^ $(LDFLAGS)
+	gcc -Wall -Wextra -lm -o $@ $^ $(LDFLAGS) -O2
 
-fonctions : fonctions_prog.o
-	gcc -lm -o $@ $^ $(LDFLAGS)
-	
 %.o:%.c 
-	gcc -lm -g -c $(CFLAGS)  $^
+	gcc -Wall -Wextra  -lm -g -c $(CFLAGS)  $^ -O2
 
 clean :
 	rm *.o dijkstra
