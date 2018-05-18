@@ -5,6 +5,7 @@
 #include <stdlib.h>
 #include <float.h>
 #include <time.h>
+#include <unistd.h>
 
 typedef long ELEMENT;
 

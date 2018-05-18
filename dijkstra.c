@@ -10,8 +10,8 @@ int main(){
 	pcc_connus = NULL; 
 	chemin_a_prendre = NULL;
 	FILE* graphe;
-    
-    char dir[100]; strcpy(dir,"/home/phelma/Documents/Projet_info_S2-master/graphes/");
+    char dir[512];
+   
     long nb_sommets, nb_arcs, i_depart, i_arrivee;
     int enable_timer = 1,temps_debut_import, temps_fin_import, temps_debut_dijkstra, temps_fin_dijkstra;
 	/*initialisation des sommets et des arcs*/

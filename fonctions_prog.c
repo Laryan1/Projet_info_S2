@@ -36,18 +36,36 @@ Liste des graphes disponibles :
 2 : graphe2.txt				5 : grapheGrandLacs.csv		8 : grapheUSAOuest.csv
 3 : grapheColorado.csv		6 : grapheNewYork.csv		9 : metroetu.csv
 */	
+//        /users/phelma/phelma2017/laffontf/Documents/Projet_info_S2-master
+    printf("\n\n######### SELECTION DU DOSSIER DES GRAPHES #########\n\n");
+    char directory[512];
+    char temp[512];
+    if (getcwd(directory, sizeof(directory)) != NULL)  fprintf(stdout, "Dossier d'execution : %s\n", directory);
+    else  perror("Probleme avec le dossier actuel.");
+    int choix_dir=-1;
+    printf("1 : selection du chemin en absolu       2 : selection du chemin en relatif");
+    while(choix_dir<1 ||choix_dir>2) {
+    	printf("\nPick your poison : "); scanf("%d", &choix_dir);
+    }
+    switch(choix_dir){
+        case 1: printf("Veuillez entrer le chemin absolu : ");    scanf("%s",dir); break;
+        case 2: strcpy(dir, directory); printf("Veuillez entrer le chemin : %s", directory); scanf("%s",temp); strcat(dir,temp); break;
+    }
+    //strcpy(dir,"/users/phelma/phelma2017/laffontf/Documents/Projet_info_S2-master/graphes/");
+    
 	printf("\n\n########## LISTE DES GRAPHES DISPONIBLES ##########\n\n");
 	printf("1 : graphe1.txt			4 : grapheFloride.csv		7 : grapheUSACentral.csv\n");
 	printf("2 : graphe2.txt			5 : grapheGrandLacs.csv		8 : grapheUSAOuest.csv\n");
 	printf("3 : grapheColorado.csv		6 : grapheNewYork.csv		9 : metroetu.csv\n");
-
-	int choix = 0;
-	while(choix<1 || choix>9){
+    printf ("0 : Graphe personnalisé\n");
+	int choix = -1;
+	while(choix<0 || choix>9){
 		printf("\nChoisissez un graphe : ");scanf("%d", &choix);
 	}
 
 	char nom_fichier[50];
 	switch (choix){
+	    case 0: printf("Nom du fichier de graphe a importer : "); scanf("%s",nom_fichier); break;
 		case 1: strcpy(nom_fichier, "graphe1.txt"); break;
 		case 2: strcpy(nom_fichier, "graphe2.txt"); break;
 		case 3: strcpy(nom_fichier, "grapheColorado.csv"); break;
@@ -58,9 +76,9 @@ Liste des graphes disponibles :
 		case 8: strcpy(nom_fichier, "grapheUSAOuest.csv"); break;
 		case 9: strcpy(nom_fichier, "metroetu.csv"); break;
 	}
-
 	strcat(dir, nom_fichier);
 	printf("\ndir: %s",dir);
+	puts("");
 	return dir;
 	
 }
@@ -85,7 +103,7 @@ void sel_depart_arrivee(long* p_i_depart, long* p_i_arrivee, long nb_sommets, SO
 }
 
 void afficher_sommet(SOMMET s){
-	printf("nom : %s\tligne : %s\tlattitude : %.4lf\tlongitute : %.4lf", s.nom, s.route, s.x, s.y);
+	printf("nom :  %s\tligne : %s\tlattitude : %.4lf\tlongitute : %.4lf", s.nom, s.route, s.x, s.y);
 }
 
 void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs){
