@@ -9,7 +9,7 @@ int main(){
 	Liste pcc_connus, chemin_a_prendre; 
 	pcc_connus = NULL; 
 	chemin_a_prendre = NULL;
-	FILE* graphe;
+	FILE* graphe=NULL;
     char dir[512];
    
     long nb_sommets, nb_arcs, i_depart, i_arrivee;
@@ -19,8 +19,14 @@ int main(){
 
     char* nom_fichier = sel_graphe(dir);
     if (enable_timer){temps_debut_import = time(NULL);}
+    
 	graphe=fopen(nom_fichier,"r");
 
+    if (graphe == NULL)
+    {
+        perror("Impossible d'ouvrir le fichier.\nError ");
+        exit(0);
+    }
     fscanf(graphe,"%ld %ld", &(nb_sommets), &(nb_arcs));
     SOMMET* liste_sommets = calloc(nb_sommets, sizeof(SOMMET));
 
