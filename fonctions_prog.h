@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <float.h>
+#include <math.h>
 #include <time.h>
 #include <unistd.h>
 
@@ -24,8 +25,15 @@ char* sel_graphe(char* dir);
 void sel_depart_arrivee(long* p_i_depart, long* p_i_arrivee, long nb_sommets, SOMMET* liste_sommets);
 int appartient(Liste sommet_visites, long arrivee);
 void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs);																								//Lit l'intégralité du fichier et récupère et stocke toutes les informations nécessaires.
-void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arrivee, long nb_sommets );
+void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee, long nb_sommets );
 long min_pcc(Liste pcc_connus, SOMMET* liste_sommets);
 
 void afficher_chemin(Liste chemin_a_prendre, SOMMET* liste_sommets, long i_depart, long i_arrivee);
 void afficher_secondes(int secondes);	
+
+long* ajout_pcc(long* tab, long* taille_tab,long indice, SOMMET* liste_sommets);
+long* suppr_pcc(long* tab, long* taille_tab, SOMMET* liste_sommets);
+void augmentetas(long* tas, int i, SOMMET* liste_sommets);
+void constructiontas(long* tas, int n, SOMMET* liste_sommets);
+void suppressiontas(long* tas, int i, SOMMET* liste_sommets);
+void descendretas(long *tas, long i, long indice_pere,SOMMET* liste_sommets);

@@ -6,8 +6,7 @@
 #include <time.h>
 
 int main(){
-	Liste pcc_connus, chemin_a_prendre; 
-	pcc_connus = NULL; 
+	Liste chemin_a_prendre; 
 	chemin_a_prendre = NULL;
 	FILE* graphe=NULL;
     char dir[512];
@@ -47,7 +46,7 @@ int main(){
 	/*dijkstra*/
 	if (enable_timer){temps_debut_dijkstra = time(NULL);}
 
-	dijkstra(liste_sommets, pcc_connus, i_depart, i_arrivee, nb_sommets);
+	dijkstra(liste_sommets, i_depart, i_arrivee, nb_sommets);
 
 	//On a trouve le chemin le plus court, il faut maintenant "remonter" le chemin entre l'arrivee et le depart
 	//Pour cela on utilise  une liste que l'on ou l'on va ajouter en tete les peres jusqu'a arrivee au point de depart

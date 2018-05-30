@@ -4,6 +4,91 @@
 /* ################ FONCTIONS ############# */
 /* ######################################## */
 
+long* ajout_pcc(long* tab, long* taille_tab,long indice, SOMMET* liste_sommets){
+	(*taille_tab)++;
+	tab[*(taille_tab)-1]=indice;
+	augmentetas(tab, *(taille_tab)-1, liste_sommets);
+	return tab;
+
+}
+long* suppr_pcc(long* tab, long* taille_tab, SOMMET* liste_sommets){
+	suppressiontas(tab, *(taille_tab)-1, liste_sommets);
+	(*taille_tab)--;
+	return tab;
+}
+
+void augmentetas(long* tas, int i, SOMMET* liste_sommets){
+    long temp=0;
+    if (i>0){
+        if ( liste_sommets[tas[i]].pcc < liste_sommets[tas[(i-1)/2]].pcc ){
+
+                temp=tas[(i-1)/2];
+                tas[(i-1)/2]=tas[i];
+                tas[i]=temp;
+                augmentetas(tas,((i-1)/2),liste_sommets);
+        }
+    }
+}
+
+void constructiontas(long* tas, int n, SOMMET* liste_sommets){
+    int i=0;
+    for (;i<n;i++){
+        augmentetas(tas,i,liste_sommets);
+    }
+}
+/*
+void descendretas(long* tas, long i,SOMMET* liste_sommets){
+    long temp=0;
+    int indice=0;
+    while (indice<=i/2){
+        if ( (liste_sommets[tas[2*(indice+1)]].pcc > liste_sommets[tas[2*(indice+1)-1]].pcc) || (2*(indice+1)>i) ){
+            temp=tas[2*(indice+1)-1];
+            tas[2*(indice+1)-1]=tas[indice];
+            tas[indice]=temp;
+            indice=2*(indice+1)-1;
+        }
+        else {
+            temp=tas[2*(indice+1)];
+            tas[2*(indice+1)]=tas[indice];
+            tas[indice]=temp;
+            indice=2*(indice+1);
+        }
+    }
+}
+*/
+void descendretas(long *tas, long i, long indice_pere,SOMMET* liste_sommets){
+    if(i<=0) return;
+
+    //selection du fils avec lequel on fera l'echange
+    long indice_fils;
+    long  fils1=2*(indice_pere+1)-1, fils2=2*(indice_pere+1);
+
+    if(fils1>i-1)        return; 				//il n'y a pas de fils
+    else if(fils2>i-1)       indice_fils=fils1;			//il n'y a qu'un fils
+    else{ //il y a deux fils, on doit troiver le plus grand des deux.
+        if(liste_sommets[tas[fils1]].pcc<liste_sommets[tas[fils2]].pcc)	indice_fils=fils1;
+        else	indice_fils=fils2;
+    }
+    //test pour savoir si on fait l'echange
+    double pere=liste_sommets[tas[indice_pere]].pcc, fils=liste_sommets[tas[indice_fils]].pcc;
+    if(pere<fils) return;
+    else{
+	long temp=tas[indice_pere];
+        tas[indice_pere]=tas[indice_fils];
+        tas[indice_fils]=temp;
+        descendretas(tas, i, indice_fils, liste_sommets);
+    }
+}
+
+void suppressiontas(long* tas, int i, SOMMET* liste_sommets){
+    long temp=0;
+    temp=tas[i];
+    tas[i]=tas[0];
+    tas[0]=temp;
+    if (i>0) descendretas(tas,i,0,liste_sommets);
+
+}
+
 ARC creer_arc(long arrivee, double cout){
 	//Permet de creer un arc. De base il ne contient pas d'arc suivant
 	// On peut ajouter des arcs avec la fonction "ajouter_arc"
@@ -30,13 +115,10 @@ SOMMET creer_sommet(char* nom_sommet, char* route, double lattitude, double long
 }
 
 char* sel_graphe(char* dir){
-	/*
-Liste des graphes disponibles : 
+/*Liste des graphes disponibles : 
 1 : graphe1.txt				4 : grapheFloride.csv		7 : grapheUSACentral.csv
 2 : graphe2.txt				5 : grapheGrandLacs.csv		8 : grapheUSAOuest.csv
-3 : grapheColorado.csv		6 : grapheNewYork.csv		9 : metroetu.csv
-*/	
-//        /users/phelma/phelma2017/laffontf/Documents/Projet_info_S2-master
+3 : grapheColorado.csv		6 : grapheNewYork.csv		9 : metroetu.csv*/	
     printf("\n\n######### SELECTION DU DOSSIER DES GRAPHES #########\n\n");
     char directory[512];
     char temp[512];
@@ -57,7 +139,7 @@ Liste des graphes disponibles :
 	printf("1 : graphe1.txt			4 : grapheFloride.csv		7 : grapheUSACentral.csv\n");
 	printf("2 : graphe2.txt			5 : grapheGrandLacs.csv		8 : grapheUSAOuest.csv\n");
 	printf("3 : grapheColorado.csv		6 : grapheNewYork.csv		9 : metroetu.csv\n");
-    printf ("0 : Graphe personnalisé\n");
+    printf ("0 : Graphe personnalise\n");
 	int choix = -1;
 	while(choix<0 || choix>9){
 		printf("\nChoisissez un graphe : ");scanf("%d", &choix);
@@ -79,8 +161,7 @@ Liste des graphes disponibles :
 	strcat(dir, nom_fichier);
 	printf("\ndir: %s",dir);
 	puts("");
-	return dir;
-	
+	return dir;	
 }
 
 void sel_depart_arrivee(long* p_i_depart, long* p_i_arrivee, long nb_sommets, SOMMET* liste_sommets){
@@ -194,19 +275,24 @@ Liste ajout_tete(ELEMENT e, Liste L){
 	return(p);
 }
 
-void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arrivee,long nb_sommets ){
+void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommets ){
 	Arbre sommet_visites=creer_chene(nb_sommets);
+	long i_pt_courant;
+	long i_voisin;
 //#################################################################################
-	pcc_connus = ajout_trie(i_depart, pcc_connus,liste_sommets);
+	long* pcc_connus;
+	pcc_connus=calloc(nb_sommets,sizeof(long));
+	pcc_connus[0]=i_depart;
+	long taille_pcc_connus=1;
 //#################################################################################
 	long compteur = 0;
 	int tmps = time(NULL);
 	printf("Nombre de points parcourus : 0");
 
 	do{
-		long i_pt_courant = pcc_connus->val;
+		i_pt_courant = pcc_connus[0];
 		//Le point courant est celui de plus petit pcc (Le premier de la liste pcc_connus)
-		pcc_connus = supprimer_trie(pcc_connus);
+		pcc_connus=suppr_pcc(pcc_connus, &taille_pcc_connus, liste_sommets);
 		//On supprime donc le point courant de la liste des pcc connus
 		if (est_present(i_pt_courant,nb_sommets,sommet_visites)==0){
 
@@ -216,7 +302,7 @@ void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arri
 			//C'est le premier voisin a considerer
 			while(arc_voisin!=NULL){
 				//Grace a ce while, on parcous toute la liste des voisin. A chaque tour de boucle, on remplace arc_voisin par l'arc suivant	
-				long i_voisin = arc_voisin->arrivee;
+				i_voisin = arc_voisin->arrivee;
 
 				if(liste_sommets[i_voisin].pcc > liste_sommets[i_pt_courant].pcc + arc_voisin->cout){
 					//Si le pcc actuel du voisin est plus grand que la somme du pcc du pt courant et du cout entre les 2 point, on remplace le pcc et le pere
@@ -227,7 +313,7 @@ void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arri
 		//#################################################################################
 				if (est_present(i_voisin,nb_sommets,sommet_visites)==0){
 					//Si le point n'a pas deja ete visite, on l'ajoute a la liste des pcc.
-					pcc_connus = ajout_trie(i_voisin, pcc_connus,liste_sommets); 
+					pcc_connus=ajout_pcc(pcc_connus, &taille_pcc_connus, i_voisin, liste_sommets);
 				}
 		//#################################################################################
 				arc_voisin = arc_voisin->suiv;
@@ -235,17 +321,16 @@ void dijkstra(SOMMET* liste_sommets, Liste pcc_connus,long i_depart, long i_arri
 
 			/*Affichage du nombre de points parcourus toutes les secondes : */
 			compteur ++;
-			if (tmps+1>= time(NULL)){
+			/*if (tmps+1>= time(NULL)){
 				printf("\rNombre de points parcourus : %ld", compteur);
 				tmps = time(NULL);
-			}
+			}*/
 		}
-	} while(est_present(i_arrivee,nb_sommets,sommet_visites)==0 && pcc_connus != NULL);
+	} while(est_present(i_arrivee,nb_sommets,sommet_visites)==0 && taille_pcc_connus!=0);
 
-	while(pcc_connus) pcc_connus=supprimer_trie(pcc_connus);
+	while(taille_pcc_connus!=0) pcc_connus=suppr_pcc(pcc_connus, &taille_pcc_connus, liste_sommets);
 	free_arbre(sommet_visites);
 }
-
 
 Liste remonter_chemin(Liste chemin_a_prendre, long i_arrivee, long i_depart, SOMMET* liste_sommets){
 	if(liste_sommets[i_arrivee].pere == -1) return ajout_tete(-1, chemin_a_prendre);
@@ -295,4 +380,3 @@ void afficher_secondes(int secondes){
 	if (minutes > 0){printf("%dmin ",minutes);}
 	printf("%ds\n",secondes);
 }
-
