@@ -28,22 +28,17 @@ int main(){
     }
     fscanf(graphe,"%ld %ld", &(nb_sommets), &(nb_arcs));
     SOMMET* liste_sommets = calloc(nb_sommets, sizeof(SOMMET));
-
+	//Initialisation
 	initialisation(graphe, liste_sommets, &nb_sommets, &nb_arcs);
-	
+	//Fermeture du fichier de graphe
 	fclose(graphe);
 
 	if (enable_timer){temps_fin_import = time(NULL);printf("\n\nTemps d'initialisation : ");afficher_secondes(temps_fin_import-temps_debut_import);printf("\n");}
 
-	/*Selections du depart depart + arrivee */
+	//Selections du depart depart + arrivee 
 	sel_depart_arrivee(&i_depart, &i_arrivee, nb_sommets, liste_sommets);
-	/*EN DUR*//*
-	i_depart = 1;
-	liste_sommets[i_depart].pcc = 0;
-	i_arrivee = 10;
-	*/
 
-	/*dijkstra*/
+	//dijkstra
 	if (enable_timer){temps_debut_dijkstra = time(NULL);}
 
 	dijkstra(liste_sommets, i_depart, i_arrivee, nb_sommets);
@@ -55,7 +50,7 @@ int main(){
 	
 	chemin_a_prendre = remonter_chemin(chemin_a_prendre, i_arrivee, i_depart, liste_sommets);
 	afficher_chemin(chemin_a_prendre, liste_sommets, i_depart, i_arrivee);
-
+	//Liberation de l'espace memoire du tableau "liste_sommets"
 	free(liste_sommets);
 
 	if (enable_timer){temps_fin_dijkstra = time(NULL);printf("\n\nTemps de recherche : ");afficher_secondes(temps_fin_dijkstra-temps_debut_dijkstra);printf("\n\n");}
