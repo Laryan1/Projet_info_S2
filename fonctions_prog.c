@@ -4,6 +4,12 @@
 /* ################ FONCTIONS ############# */
 /* ######################################## */
 
+int est_visite(long indice, SOMMET* liste_sommets){
+	if (liste_sommets[indice].visite==1) return 1;
+	else return 0;
+}
+
+
 long* ajout_pcc(long* tab, long* taille_tab,long indice, SOMMET* liste_sommets){
 	//On ajoute le sommet d'indice i au tas.
 	(*taille_tab)++; //La taille du tas augmente donc.
@@ -83,6 +89,7 @@ SOMMET creer_sommet(char* nom_sommet, char* route, double lattitude, double long
     sommet.voisins=nouvel_arc;
     sommet.pcc=DBL_MAX;
     sommet.pere=-1;
+    sommet.visite=-1;
     return sommet;
 }
 
@@ -166,7 +173,7 @@ void afficher_sommet(SOMMET s){
 }
 
 void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs){
-	char route[512], nom_sommet[511]; str[512];
+	char route[512], nom_sommet[511], str[512];
 	long indice_sommet, indice_depart, indice_arrivee;
 	double lattitude, longitude, cout;
 	long cmpt=0;
@@ -241,7 +248,6 @@ Liste ajout_tete(ELEMENT e, Liste L){
 
 void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommets ){
 	//Creation de l'arbre 10-aire permettant de verifier qu'un sommet a ou non deja ete visite.
-	Arbre sommet_visites=creer_chene(nb_sommets);
 	long i_pt_courant;
 	long i_voisin;
 	//Initialisation du tableau contenant les sommets a traiter, le tableau est en fait un tas binaire trié.
@@ -257,8 +263,8 @@ void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommet
 		//Le point courant est celui de plus petit pcc (Le premier de la liste pcc_connus)
 		pcc_connus=suppr_pcc(pcc_connus, &taille_pcc_connus, liste_sommets);
 		//On supprime donc le point courant de la liste des pcc connus
-		if (est_present(i_pt_courant,nb_sommets,sommet_visites)==0){
-			ajouter_arbre(i_pt_courant, nb_sommets, sommet_visites);
+		if (est_visite(i_pt_courant,liste_sommets)==0){
+			liste_sommets[i_pt_courant].visite=1;
 			//On ajoute ce point a la liste des points visites, c'est a dire dont on a trouve la plus petit pcc
 			ARC arc_voisin = liste_sommets[i_pt_courant].voisins;
 			//C'est le premier voisin a considerer
@@ -271,7 +277,7 @@ void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommet
 					liste_sommets[i_voisin].pere = i_pt_courant;
 				}
 				//On teste si le sommet a deja ete visite, s'il ne la pas ete, on l'ajoute au tas pcc_connus.
-				if (est_present(i_voisin,nb_sommets,sommet_visites)==0){
+				if (est_visite(i_voisin,liste_sommets)==0){
 					pcc_connus=ajout_pcc(pcc_connus, &taille_pcc_connus, i_voisin, liste_sommets);
 				}
 				arc_voisin = arc_voisin->suiv;
@@ -283,9 +289,8 @@ void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommet
 				tmps = time(NULL);
 			}
 		}
-	} while(est_present(i_arrivee,nb_sommets,sommet_visites)==0 && taille_pcc_connus!=0); //Condition d'arret de la fonction dijkstra.
+	} while(est_visite(i_arrivee,liste_sommets)==0 && taille_pcc_connus!=0); //Condition d'arret de la fonction dijkstra.
 	while(taille_pcc_connus!=0) pcc_connus=suppr_pcc(pcc_connus, &taille_pcc_connus, liste_sommets); //On libere l'espace alloue pour le tas.
-	free_arbre(sommet_visites);	//On libere l'espace alloue par l'arbre 10-aire
 }
 
 Liste remonter_chemin(Liste chemin_a_prendre, long i_arrivee, long i_depart, SOMMET* liste_sommets){

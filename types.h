@@ -16,6 +16,7 @@ typedef struct { 			// Definition de la structure qui va contenir nos variables.
 								//				   - l'adresse du voisin suivant
 	double pcc; 				// Coût total pour aller à la ville en question depuis la ville de depart.
 	long pere; 					// Indice de la ville menant à la ville en question par le chemin le plus court.
+	int visite;
 
 } SOMMET ;
 

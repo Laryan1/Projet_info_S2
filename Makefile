@@ -4,7 +4,7 @@ DIRSDL=
 CFLAGS=
 LDFLAGS=
 
-dijkstra : fonctions_prog.o dijkstra.o arbres.o
+dijkstra : fonctions_prog.o dijkstra.o
 	gcc -Wall -Wextra -lm -o $@ $^ $(LDFLAGS)
 
 %.o:%.c 

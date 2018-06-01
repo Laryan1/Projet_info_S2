@@ -1,5 +1,4 @@
 #include "types.h"
-#include "arbres.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -27,6 +26,7 @@ int appartient(Liste sommet_visites, long arrivee);
 void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs);																								//Lit l'intégralité du fichier et récupère et stocke toutes les informations nécessaires.
 void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee, long nb_sommets );
 long min_pcc(Liste pcc_connus, SOMMET* liste_sommets);
+int est_visite(long indice, SOMMET* liste_sommets);
 
 void afficher_chemin(Liste chemin_a_prendre, SOMMET* liste_sommets, long i_depart, long i_arrivee);
 void afficher_secondes(int secondes);	
