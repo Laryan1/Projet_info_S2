@@ -9,15 +9,14 @@ int est_visite(long indice, SOMMET* liste_sommets){
 	else return 0;
 }
 
-
 long* ajout_pcc(long* tab, long* taille_tab,long indice, SOMMET* liste_sommets){
 	//On ajoute le sommet d'indice i au tas.
 	(*taille_tab)++; //La taille du tas augmente donc.
 	tab[*(taille_tab)-1]=indice; //Ajout au tableau
 	augmentetas(tab, *(taille_tab)-1, liste_sommets); //On appelle la fonction d'augmentation du tas.
 	return tab;
-
 }
+
 long* suppr_pcc(long* tab, long* taille_tab, SOMMET* liste_sommets){
 	//On supprime le premier sommet du tas.
 	suppressiontas(tab, *(taille_tab)-1, liste_sommets); 	//On appelle la fonctino de suppression du tas.
@@ -106,14 +105,14 @@ char* sel_graphe(char* dir){
     else  perror("Probleme avec le dossier actuel.");
     //On donne le choix de rentrer le dossier des graphes de maniere absolue (Racine) ou relatif (depuis le dossier d'execution).
     int choix_dir=-1;
-    printf("1 : selection du chemin en absolu       2 : selection du chemin en relatif");
+    printf("1 : selection du chemin en absolu       2 : selection du chemin en relatif\n");
     while(choix_dir<1 ||choix_dir>2) {
     	printf("\nChoisissez le moyen d'entrer le chemin vers le dossier du/des graphe(s) : "); scanf("%d", &choix_dir);
     }
     //On demande ensuite a l'utilisateur d'entrer le chemin en relatif ou absolu, selon son choix.
     switch(choix_dir){
-        case 1: printf("Veuillez entrer le chemin absolu : ");    scanf("%s",dir); break;
-        case 2: strcpy(dir, directory); printf("Veuillez entrer le chemin : %s", directory); scanf("%s",temp); strcat(dir,temp); break;
+        case 1: printf("\nVeuillez entrer le chemin absolu (n'oubliez pas le '/' a la fin) :");    scanf("%s",dir); break;
+        case 2: strcpy(dir, directory); printf("\nVeuillez entrer le chemin (n'oubliez pas le '/' a la fin) :\n%s", directory); scanf("%s",temp); strcat(dir,temp); break;
     }    
     //On affiche a l'ecran une liste des graphes generalement presents.
     printf("\n\n########## LISTE DES GRAPHES DISPONIBLES ##########\n\n");
@@ -127,13 +126,12 @@ char* sel_graphe(char* dir){
 	while(choix<0 || choix>9){
 		printf("\nChoisissez un graphe : ");scanf("%d", &choix);
 	}
-
-	char nom_fichier[50];
+	char nom_fichier[500];
 	switch (choix){
 	    //L'utilisateur fait son choix, et le graphe correspondant est selectionne. Dans le cas "0", on procede a un scanf.
 	    case 0: printf("Nom du fichier de graphe a importer : "); scanf("%s",nom_fichier); break;
 	    case 1: strcpy(nom_fichier, "graphe1.txt"); break;
-            case 2: strcpy(nom_fichier, "graphe2.txt"); break;
+        case 2: strcpy(nom_fichier, "graphe2.txt"); break;
 	    case 3: strcpy(nom_fichier, "grapheColorado.csv"); break;
 	    case 4: strcpy(nom_fichier, "grapheFloride.csv"); break;
 	    case 5: strcpy(nom_fichier, "grapheGrandLacs.csv"); break;
@@ -142,41 +140,129 @@ char* sel_graphe(char* dir){
 	    case 8: strcpy(nom_fichier, "grapheUSAOuest.csv"); break;
 	    case 9: strcpy(nom_fichier, "metroetu.csv"); break;
 	}
+	printf("\nGraphe selectionne : %s",nom_fichier);
 	//On concatene le nom du fichier au directory precedemment selectionne, et on retourne sa valeur.
 	strcat(dir, nom_fichier);
-	printf("\ndir: %s",dir);
+	printf("\nFichier : %s\n",dir);
 	puts("");
 	return dir;	
 }
 
-void sel_depart_arrivee(long* p_i_depart, long* p_i_arrivee, long nb_sommets, SOMMET* liste_sommets){
+long hachage(char* mot,long dim_tab_hach){
+    int i = 0;
+    long N=dim_tab_hach;
+    unsigned long h=0, a=31;
+    i=strlen(mot)-1;
+    h=mot[i];
+    for (;i>=0;i--){
+        h=(h*a+mot[i])%N;
+    }
+    return h%N;
+}
+
+void viderBuffer()
+{
+    int c = 0;
+    while (c != '\n' && c != EOF)
+    {
+        c = getchar();
+    }
+}
+
+void sel_depart_arrivee(long* p_i_depart, long* p_i_arrivee, long nb_sommets, SOMMET* liste_sommets,Liste* tab_hach,long taille_tab_hach, int choix_recherche){
 	nb_sommets -=1; // l'indice max est le nb de sommet -1
-	printf("\nQuel est l'indice du point de depart : ");
-	do{
-		scanf("%ld",p_i_depart);
-		if(*p_i_depart > nb_sommets)printf("\n/!\\ Ce sommet n'existe pas : l'indice du dernier sommet est %ld /!\\\nVeuillez en rentrer un nouveau depart : ", nb_sommets);
-	}while(*p_i_depart > nb_sommets);
-	printf("\nQuel est l'indice du point d'arrivee : ");
-	
-	do{
-		scanf("%ld",p_i_arrivee);
-		if(*p_i_arrivee > nb_sommets)printf("\n/!\\ Ce sommet n'existe pas : l'indice du dernier sommet est %ld /!\\\nVeuillez en rentrer une nouvelle arrivee : ", nb_sommets);
-	}while(*p_i_arrivee > nb_sommets);
-	printf("\n");
+	int choix=-1;
+	if (choix_recherche==1){
+	    printf("\nVoulez-vous faire une recherche : \n1 : Par indice de sommet\t\t2 : Par nom de sommet");
+	    while(choix<1 ||choix>2) {
+	    	printf("\nChoisissez la méthode de recherche à effectuer : "); scanf("%d", &choix);
+	    }
+	}
+    //On demande ensuite a l'utilisateur d'entrer le chemin en relatif ou absolu, selon son choix.
+    if (choix==2){
+    	char ligne[500];
+    	char nom_sommet_depart[500];
+    	char nom_sommet_arrivee[500];
+    	Liste temp=NULL;
+	    viderBuffer(); //On vide le buffer
+	    while (temp==NULL){
+	    	printf("\nEntrez le nom du sommet de depart a rechercher : ");
+	    	fgets(ligne, sizeof(ligne), stdin); 				//On recupere la ligne ecrite a l'ecran
+	    	sscanf(ligne, "%255[^\n]", nom_sommet_depart);		//Dans cette ligne on recupere le nom du sommet entre
+	    	temp=tab_hach[hachage(nom_sommet_depart,taille_tab_hach)];
+	    	while(temp!=NULL){
+	    		if (strcmp(nom_sommet_depart,liste_sommets[temp->val].nom)==0) break;
+	    		temp=temp->suiv;
+	    	}
+	    	if (temp==NULL){
+	    		printf("La recherche du sommet n'a rien donne.");
+	    	}
+	    	else {
+	    		printf("Le sommet '%s' d'indice %ld a ete trouve.\n\n",nom_sommet_depart,temp->val);
+	    		*p_i_depart=temp->val;
+	    	}
+	    }
+	    temp=NULL;
+	    while (temp==NULL){
+	    	printf("\nEntrez le nom du sommet d'arrive a rechercher : ");
+	    	fgets(ligne, sizeof(ligne), stdin); 			 	//On recupere la ligne ecrite a l'ecran
+	    	sscanf(ligne, "%255[^\n]", nom_sommet_arrivee); 	//Dans cette ligne on recupere le nom du sommet entre
+	    	temp=tab_hach[hachage(nom_sommet_arrivee,taille_tab_hach)];
+	    	while(temp!=NULL){
+	    		if (strcmp(nom_sommet_arrivee,liste_sommets[temp->val].nom)==0) break;
+	    		temp=temp->suiv;
+	    	}
+	    	if (temp==NULL){
+	    		printf("La recherche du sommet n'a rien donne.");
+	    	}
+	    	else {
+	    		printf("Le sommet '%s' d'indice %ld a ete trouve.",nom_sommet_arrivee,temp->val);
+	    		*p_i_arrivee=temp->val;
+	    	}
+	    }
+    }
+	else{
+		printf("\nIndice minimal : 0\t\t Indice maximal : %ld",nb_sommets);
+		printf("\nQuel est l'indice du point de depart : ");
+		do{
+			scanf("%ld",p_i_depart);
+
+			if(*p_i_depart > nb_sommets)printf("\n/!\\ Ce sommet n'existe pas : l'indice du dernier sommet est %ld /!\\\nVeuillez en rentrer un nouveau depart : ", nb_sommets);
+		}while(*p_i_depart > nb_sommets);
+		printf("\nQuel est l'indice du point d'arrivee : ");
+		
+		do{
+			scanf("%ld",p_i_arrivee);
+			if(*p_i_arrivee > nb_sommets)printf("\n/!\\ Ce sommet n'existe pas : l'indice du dernier sommet est %ld /!\\\nVeuillez en rentrer une nouvelle arrivee : ", nb_sommets);
+		}while(*p_i_arrivee > nb_sommets);
+		printf("\n");
+	}
 
 	liste_sommets[*p_i_depart].pcc = 0;
 	liste_sommets[*p_i_depart].pere = *p_i_depart;
 }
 
 void afficher_sommet(SOMMET s){
-	printf("nom :  %s\tligne : %s\tlattitude : %.4lf\tlongitude : %.4lf", s.nom, s.route, s.x, s.y);
+	printf("nom : %35s\tligne : %s\tlattitude : %.4lf\tlongitude : %.4lf", s.nom, s.route, s.x, s.y);
 }
 
-void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs){
+void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs, Liste* tab_hach,long taille_tab_hach, int* choix){
 	char route[512], nom_sommet[511], str[512];
 	long indice_sommet, indice_depart, indice_arrivee;
 	double lattitude, longitude, cout;
 	long cmpt=0;
+	int i;
+	*choix=-1;
+	//Initialisation des variables pour la table de hachage
+	for (i=0;i<taille_tab_hach;i++) tab_hach[i]=NULL;
+	//Selection de la methode de recherche de sommet, par indice ou par nom. Si le graphe etudie contient trop de sommets, on ne propose pas la table de hachage.
+	if(*nb_sommets<100000){
+		printf("Le programme doit-il permettre la recherche par nom ? \n1 : Oui\t\t2 : Non");
+			while(*choix<1 ||*choix>2) {
+			printf("\nChoisissez le moyen de recherche des sommets : "); scanf("%d", choix);
+		}
+	}
+	else *choix=2;
 	ARC temp_arc;
 	//Les deux premieres lignes apres le nombre de sommets et d'arcs ne ser
 	fgets(str,511,graphe);
@@ -184,11 +270,17 @@ void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* 
 	//On recupere maintenant les sommets et leurs informations.
     for (cmpt=0; cmpt<(*nb_sommets);cmpt++){
         fscanf(graphe,"%ld %lf %lf %s",&indice_sommet, &lattitude, &longitude,route);
-	fgets(str,2,graphe);
-	fgets(nom_sommet,511,graphe);
-	strchr(nom_sommet,'\n')[0]='\0';
+		fgets(str,2,graphe);
+		fgets(nom_sommet,511,graphe);
+		strchr(nom_sommet,'\n')[0]='\0';
         liste_sommets[cmpt]=creer_sommet(nom_sommet,route,lattitude,longitude);
+        //Creation table de hachage selon nom des sommets, on insere dans la table de hachage l'indice du sommet et non son nom.
+    	if (*choix==1){
+	    	long cle=hachage(nom_sommet,taille_tab_hach);
+			tab_hach[cle]=ajout_tete(cmpt, tab_hach[cle]);
+		}
     }
+
 	//La ligne entre sommets et arcs est inutile.
 	fgets(str,511,graphe);
 	//On recupere maintenant les arcs et leur cout.	
@@ -206,6 +298,7 @@ void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* 
 	    else (temp_arc->suiv=creer_arc(indice_arrivee, cout));				// On ajoute notre arc nouvellement cree a la fin de la liste des voisins
     	}
     }
+
 }
 
 Liste ajout_trie(ELEMENT e, Liste L,SOMMET* liste_sommets){
@@ -246,7 +339,7 @@ Liste ajout_tete(ELEMENT e, Liste L){
 	return(p);
 }
 
-void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommets ){
+long dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommets ){
 	//Creation de l'arbre 10-aire permettant de verifier qu'un sommet a ou non deja ete visite.
 	long i_pt_courant;
 	long i_voisin;
@@ -256,8 +349,6 @@ void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommet
 	pcc_connus[0]=i_depart;
 	long taille_pcc_connus=1;
 	long compteur = 0;
-	int tmps = time(NULL);
-	printf("Nombre de points parcourus : 0");
 	do{
 		i_pt_courant = pcc_connus[0];
 		//Le point courant est celui de plus petit pcc (Le premier de la liste pcc_connus)
@@ -282,22 +373,17 @@ void dijkstra(SOMMET* liste_sommets,long i_depart, long i_arrivee,long nb_sommet
 				}
 				arc_voisin = arc_voisin->suiv;
 			}
-			//Affichage du nombre de points parcourus toutes les secondes
+		//Affichage du nombre de points parcourus toutes les secondes
 			compteur ++;
-			if (tmps+1<= time(NULL)){
-				printf("\rNombre de points parcourus : %ld", compteur);
-				tmps = time(NULL);
-			}
 		}
 	} while(est_visite(i_arrivee,liste_sommets)==0 && taille_pcc_connus!=0); //Condition d'arret de la fonction dijkstra.
-	while(taille_pcc_connus!=0) pcc_connus=suppr_pcc(pcc_connus, &taille_pcc_connus, liste_sommets); //On libere l'espace alloue pour le tas.
+	free(pcc_connus); //On libere l'espace alloue pour le tas.
+	return compteur;
 }
 
 Liste remonter_chemin(Liste chemin_a_prendre, long i_arrivee, long i_depart, SOMMET* liste_sommets){
 	if(liste_sommets[i_arrivee].pere == -1) return ajout_tete(-1, chemin_a_prendre);
-
 	chemin_a_prendre = ajout_tete(i_arrivee, chemin_a_prendre);
-
 	while(chemin_a_prendre->val != i_depart){ // tant que le premier sommet de la liste n'est pas le point de depart
 		chemin_a_prendre = ajout_tete(liste_sommets[chemin_a_prendre->val].pere, chemin_a_prendre); //On prend le sommet que l'on considere et l'on ajoute en tete son pere
 	}
@@ -315,11 +401,8 @@ void afficher_chemin(Liste chemin_a_prendre, SOMMET* liste_sommets, long i_depar
 		printf("\n##########################\n##### CHEMIN TROUVE! #####\n##########################\n\n");
 		printf("Point de depart : "); afficher_sommet(liste_sommets[i_depart]);printf("\n");
 		printf("Point d'arrivee : "); afficher_sommet(liste_sommets[i_arrivee]);printf("\n");
-
 		printf("\n##########################\n#### Route a prendre: ####\n##########################\n\n");
-
 		double cout_precedent = liste_sommets[chemin_a_prendre->val].pcc;
-
 		while(chemin_a_prendre!=NULL){
 			double cout_courant = liste_sommets[chemin_a_prendre->val].pcc;
 			afficher_sommet(liste_sommets[chemin_a_prendre->val]); printf("\tCout = %12.2lf \tCout total = %12.2lf\n", cout_courant - cout_precedent, cout_courant);
@@ -336,7 +419,6 @@ void afficher_secondes(int secondes){
 	secondes %= 60; //reste de la divion euclidienne pas 60
 	heures = minutes / 60;
 	minutes %= 60;
-
 	if (heures > 0){printf("%dh ",heures);}
 	if (minutes > 0){printf("%dmin ",minutes);}
 	printf("%ds\n",secondes);
