@@ -1,79 +1,50 @@
 # Projet_info_S2
-Projet d'info 1A - S2 PHELMA - Chemin le Plus Court
+Projet d'info 1A - S2 PHELMA - Chemin le Plus Court - Dijkstra
 
+Auteurs : BAILLY Romain -- LAFFONT Florian
 
-Les types de données utiles ressembleront à :
-Les sommets : T_SOMMET est une structure
+Version du Projet : 1.7.2
 
-typedef struct {              // Définition de la structure qui va contenir nos variables.
+Fichiers nécessaires au projet : 
 
-char* nom;                    // Nom de la ville en question.
+    Attention, avant de procéder plus loin, veuillez noter que le fonctionnement des programmes du projet nécessite un environnement linux disposant d'un terminal, de librairies de base et selon cas de SDL(s).
+    Librairies nécessaires : 
+        - string.h
+        - stdio.h
+        - stdlib.h
+        - float.h
+        - math.h
+        - time.h
+        - unistd.h
+  
+Compilation du projet :
 
-double x,y ;                  // Coordonnées (lattitude, longitude) de la ville en question
+    Afin de compiler le projet, vérifiez d'abord la présence des SDL suivantes : SDL et SDL_Draw. Renseingnez ensuite leur chemin d'accès dans le fichier "Makefile" en modifiant la première ligne "DIRSDL". Si les fichiers sont placés dans des dossiers différents vous devrez peut-être modifier les champs "CFLAGS" et "LDFLAGS".
+    Deux options de compilation s'offrent à vous, vous pouvez compiler seulement un programme n'utilisant pas d'interface graphique à l'aide de la commande "make dijkstra".
+    Vous pouvez aussi compiler une version graphique en utilisant la commande "make dijkstra_graphique".
+    Enfin la commande "make clean" vous permet en cas de problème de nettoyer les fichiers ".o", pensez à l'utiliser avant chaque nouvelle compilation pour vous assurer du bon fonctionnement du programme.
+    
+Utilisation du projet :
 
-ARC voisins;                  // Pointeur vers : - l'indice de la ville d'arrivée,
+    Une fois le projet compilé, il vous faudra pour lancer le programme de recherche du plus court chemin spécifier dans un terminal la commande suivante : "CHEMIN_D'ACCES/dijkstra" pour la version textuelle, "CHEMIN_D'ACCES/dijkstra_graphique" pour la version graphique. "CHEMIN_D'ACCES" correspond au chemin pour acceder aux fichiers. Si vous executez le terminal dans le dossier des fichiers, "CHEMIN_D'ACCES"==".".
+    
+Version Textuelle : 
 
-                                                 - le coût pour y aller depuis la ville en question,
+    Une fois lancé, le programme vous demande tout d'abord de renseigner le dossier dans lequel se trouvent les fichiers de graphes en ".txt" ou ".csv". Pour cela, le programme vous permet de rensigner le chemin vers ce dossier en adressage absolu (depuis la racine) ou en adressage relatif (depuis le dossier d'execution du projet). Le choix "1" permet la selection du chemin en absolu, le choix "2" celle du chemin en relatif. Attention à ne pas oublier de rensigner le dernier "/" à la fin du chemin.
+    
+    Le programme vous affiche ensuite une liste non exhaustive des graphes utilisés pour tester le programme et vérifier son bon fonctionnement. Ces graphes, numérotés de 1 à 9, permettent une sélection rapide du fichier. Sinon reste la possibilité de renseigner directement un nom de graphe différent, en choisissant "0". Le programme s'attend donc à ce que l'utilisateur entre un chiffre comrpis entre 0 et 9.
+    
+    Pour la suite, les cas diffèrent selon le graphe sélectionné. Si le graphe sélectionné présente plus de 100'000 sommets, la création d'une table de hachage n'est pas proposée, car cela pose problème quand les noms des sommets sont semblables, et ne sert à rien.
+    Dans le cas où le graphe présente moins de 100'000 sommets, le programme demande à l'utilisateur s'il doit permettre ou non la recherche par nom. Renseigner "1" pour oui, et "2" pour non, comme explicité dans le programme. Choisir la seconde option rejoins le cas où le graphe présente plus de 100'000 sommets, la recherche du plus court chemin n'est alors possible qu'en renseignant les indices des sommets choisis.
+    Dans le cas où la recherche par nom est permise, un dernier choix est laissé à l'utilisateur, pour confirmer la recherche par indice de sommet (choix "1") ou par nom (choix "2").
+    
+    Premier cas : recherche par indice de sommet. L'utilisateur doit entrer d'abord l'indice du point de départ, puis l'indice du point d'arrivée. L'indice doit être compris entre 0 et le nombre maximal de sommets.
+    
+    Second cas : recherche par nom de sommet. L'utilisateur doit entrer le nom du sommet de départ puis celui du sommet d'arrivé. Le nom du sommet doit être exactement celui spécifié dans le fichier de graphe, il faut respecter casse, accents et ponctuations. En cas d'erreur lors de l'entrée du nom de sommet, si celui-ci n'est pas reconnu, l'utilisateur peut à nouveau entrer un nom.
+    
+    Une fois ceci fait, le programme de recherche du plus court chemin s'exécute. Une fois la recherche terminée, s'affichent à l'écran diverses informations : le temps de recherche (en secondes), si le chemin entre les deux sommets a été trouvé, les informations des deux sommets, et enfin la route à prendre du sommet de départ à celui d'arrivé avec les informations des sommets traversés, et le coût correspondant. S'affiche donc pour le dernier sommet le coût total, suivi du nombre de sommets parcourus par le programme pour trouver le plus court chemin.
+    
+Version Graphique :
 
-                                                 - l'adresse du voisin suivant
-
-double pcc;                   // Coût total pour aller à la ville en question depuis la ville de départ.
-
-long pere;                    // Indice de la ville menant à la ville en question par le chemin le plus court.
-
-} T_SOMMET ;                  // 
-
-
-Les listes de successeurs : une liste classique avec un suivant; 
-
-les valeurs sont l'indice de la ville d'arrivée  et le coût pour y aller.
-
-typedef struct lsucc {        // Définition de la structure qui contient l'indice, le coût et le voisin suivant.
-
-long arrivee;                 // Indice de la ville voisine.
-
-double cout ;                 // Coût pour aller de la ville d'origine à la ville voisine.
-
-struct lsucc* suiv ;          // Pointeur vers l'ARC (la ville voisine) suivant(e).
-
-}* ARC;
-
-
-
-Algorithme de Dijkstra
-
-1.début
-
-2.  pour tous les sommets i de G[X,A] faire pcc[i] ß +∞; pere[i]=-1 ;
-
-3.  pcc[d] ß 0
-
-4.  S <= {}
-
-5.  C <= X
-
-6.  faire
-
-7.    Sélectionner le sommet j de C de plus petite valeur pcc[j]
-
-8.    C <= C \ j                                                            // supprimer j de l’ensemble C
-
-9.    S <= S ∪ j                                                            // ajouter j à l’ensemble S
-
-10.   pour tous les sommets k adjacents à j faire                           // les successeurs de j
-
-11.     si pcc[k] > pcc[j] + c[j][k]                                        // c(j,k) est le coût pour aller de j à k
-
-12.     alors
-
-13.       pcc[k] = pcc[j] + c[j][k];                                        w// Passer par j est plus court
-
-14.       pere[k]=j ; // pour aller de a en k
-
-15.     fin si
-
-16.   fin pour
-
-17. tant que a∉ S et pcc[j]!=+∞
-
-18.fin
+    La version graphique du programme diffère peu par son utilisation, en fait, elle permet l'affichage après l'initialisation d'une carte représentant tous les sommets et arcs du graphe. Et après avoir calculé le plus court chemin entre deux sommets, la version graphique trace en rouge sur la carte, le chemin à suivre pour aller du sommet de départ au sommet d'arrivé.
+    Le temps d'exécution de cette version du programme est plus long.
