@@ -4,7 +4,7 @@ CFLAGS=-g -I$(DIRSDL)/include -I$(DIRSDL)/include/SDL -I/usr/local/include -I/us
 #LDFLAGS= -L$(DIRSDL)/lib -L/usr/local/lib -lSDL -lSDL_ttf -lSDL_image -lSDL_draw -lSDL_phelma -lX11
 LDFLAGS=-L$(DIRSDL)/lib -L/usr/local/lib -lSDL -lSDL_draw -lSDL_phelma -lX11
 
-dijkstra : fonctions_prog.o dijkstra.o graphique.o
+dijkstra : fonctions_prog.o dijkstra.o
 	gcc -Wall -Wextra -lm -o $@ $^
 
 dijkstra_graphique: fonctions_prog.o dijkstra_graphique.o graphique.o
