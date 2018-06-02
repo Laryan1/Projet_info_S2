@@ -243,7 +243,7 @@ void sel_depart_arrivee(long* p_i_depart, long* p_i_arrivee, long nb_sommets, SO
 }
 
 void afficher_sommet(SOMMET s){
-	printf("nom : %35s\tligne : %s\tlattitude : %.4lf\tlongitude : %.4lf", s.nom, s.route, s.x, s.y);
+	printf("nom : %35s\tligne : %s\tlongitude : %.4lf\tlatitude : %.4lf", s.nom, s.route, s.x, s.y);
 }
 
 void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs, Liste* tab_hach,long taille_tab_hach, int* choix){
