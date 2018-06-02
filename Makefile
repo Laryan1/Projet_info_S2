@@ -14,4 +14,4 @@ dijkstra_graphique: fonctions_prog.o dijkstra_graphique.o graphique.o
 	gcc -Wall -Wextra -g $^ -c $(CFLAGS) 
 
 clean :
-	rm *.o dijkstra
+	rm *.o dijkstra dijkstra_graphique
