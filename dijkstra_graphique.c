@@ -79,7 +79,7 @@ int main(){
 
 	afficher_chemin_g(liste_sommets, fenetre, info_graph, chemin_a_prendre); //Version graphique (d'ou le 'g')
 	
-	printf("\nNombre de sommets parcourus : %ld",nb_parcourus);
+	printf("\nNombre de sommets parcourus : %ld\n",nb_parcourus);
 	
 	getchar();getchar();
 	
