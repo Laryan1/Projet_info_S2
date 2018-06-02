@@ -64,7 +64,7 @@ int main(){
 	if (enable_timer){temps_fin_dijkstra = time(NULL);printf("\n\nTemps de recherche : ");afficher_secondes(temps_fin_dijkstra-temps_debut_dijkstra);printf("\n\n");}
 	
 	afficher_chemin(chemin_a_prendre, liste_sommets, i_depart, i_arrivee);
-	printf("\nNombre de sommets parcourus : %ld",nb_parcourus);
+	printf("\nNombre de sommets parcourus : %ld\n",nb_parcourus);
 
 	//Liberation de l'espace memoire du tableau "liste_sommets"
 	free(liste_sommets);
