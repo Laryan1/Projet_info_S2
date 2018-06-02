@@ -65,7 +65,6 @@ int main(){
 	
 	afficher_chemin(chemin_a_prendre, liste_sommets, i_depart, i_arrivee);
 	printf("\nNombre de sommets parcourus : %ld",nb_parcourus);
-	getchar();getchar();
 
 	//Liberation de l'espace memoire du tableau "liste_sommets"
 	free(liste_sommets);
