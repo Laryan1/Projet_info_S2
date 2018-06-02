@@ -249,7 +249,7 @@ void afficher_sommet(SOMMET s){
 void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* nb_arcs, Liste* tab_hach,long taille_tab_hach, int* choix){
 	char route[512], nom_sommet[511], str[512];
 	long indice_sommet, indice_depart, indice_arrivee;
-	double lattitude, longitude, cout;
+	double latitude, longitude, cout;
 	long cmpt=0;
 	int i;
 	*choix=-1;
@@ -269,11 +269,11 @@ void initialisation(FILE* graphe,SOMMET* liste_sommets, long* nb_sommets, long* 
 	fgets(str,511,graphe);
 	//On recupere maintenant les sommets et leurs informations.
     for (cmpt=0; cmpt<(*nb_sommets);cmpt++){
-        fscanf(graphe,"%ld %lf %lf %s",&indice_sommet, &lattitude, &longitude,route);
+        fscanf(graphe,"%ld %lf %lf %s",&indice_sommet, &latitude, &longitude,route);
 		fgets(str,2,graphe);
 		fgets(nom_sommet,511,graphe);
 		strchr(nom_sommet,'\n')[0]='\0';
-        liste_sommets[cmpt]=creer_sommet(nom_sommet,route,lattitude,longitude);
+        liste_sommets[cmpt]=creer_sommet(nom_sommet,route,latitude,longitude);
         //Creation table de hachage selon nom des sommets, on insere dans la table de hachage l'indice du sommet et non son nom.
     	if (*choix==1){
 	    	long cle=hachage(nom_sommet,taille_tab_hach);
